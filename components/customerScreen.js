@@ -3,12 +3,16 @@ import { useForm, Controller } from "react-hook-form";
 import { TextInput, Button } from "react-native-paper";
 import { styles } from "../assets/Styles/Styles";
 import axios from "axios";
+import { useState } from "react";
 
 export default function customerScreen() {
+  const[messege,setmessage]=useState('')
+  const [isError,setIsError]=useState('false')
+  const [idSearch,SetidSearch]=useState('')
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors },reset,setValue
   } = useForm({
     defaultValues: {
       firstName: "",
@@ -22,12 +26,34 @@ export default function customerScreen() {
       nombre,
       apellidos,
     });
+    setIsError(false);
+    setmessage("cliente agregado correctamente");
+    setTimeout(() => {
+      setmessage('');
+    }, 2000);
+      reset()
   }
   // } console.log(data);
-  
+  const onSearch=async()=>{
+    const response=await axios.post(`http://127.0.0.1:3000/api/clientes/${idSearch}`);
+    console.log(response.data)
+    if(!response.data.errors){
+      setValue("firstName",response.data.data.nombre)
+      setValue("lastName",response.data.data.apellidos)
+    }else{
+      setIsError(true)
+      setmessage("id del cliente no existe")
+    }
+  }
   return (
     <View style={styles.container}>
       <Text style={{fontSize:32}}>CLIENTES</Text>
+      <TextInput
+      label="Ingrese el id que  desea buscar"
+      mode="outlined"
+      left=""
+      onChangeText={idSearch=>SetidSearch(idSearch)}
+      value={idSearch}></TextInput>
       <Controller
         control={control}
         rules={{
@@ -73,6 +99,7 @@ export default function customerScreen() {
       {errors.lastName && (
         <Text style={{ color: "red" }}> el apellido es obligatorio.</Text>
       )}
+      <Text style={{color:isError?'red':'green'}}>{messege}</Text>
       <View style={{flexDirection:'row',gap:10}}>
         <Button
           icon="plus-box"
@@ -85,7 +112,7 @@ export default function customerScreen() {
         <Button
           icon="card-search-outline"
           mode="contained"
-          onPress={() => console.log("Pressed")}
+          onPress={(onSearch)}
           style={{ backgroundColor: "pink" }}
         >
           BUSCAR
