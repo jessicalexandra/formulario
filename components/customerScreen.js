@@ -35,11 +35,11 @@ export default function customerScreen() {
   }
   // } console.log(data);
   const onSearch=async()=>{
-    const response=await axios.post(`http://127.0.0.1:3000/api/clientes/${idSearch}`);
+    const response=await axios.get(`http://127.0.0.1:3000/api/clientes/${idSearch}`);
     console.log(response.data)
-    if(!response.data.errors){
-      setValue("firstName",response.data.data.nombre)
-      setValue("lastName",response.data.data.apellidos)
+    if(response.data){
+      setValue("firstName",response.data.nombre)
+      setValue("lastName",response.data.apellidos)
     }else{
       setIsError(true)
       setmessage("id del cliente no existe")
