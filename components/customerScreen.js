@@ -22,7 +22,7 @@ export default function customerScreen() {
   const onSave = async(data) =>{
     let nombre=data.firstName
     let apellidos=data.lastName
-    const response = await axios.post(`http://127.0.0.1:3000/api/clientes`, {
+    const response = await axios.post(`http://localhost:3000/api/clientes`, {
       nombre,
       apellidos,
     });
@@ -33,6 +33,33 @@ export default function customerScreen() {
     }, 2000);
       reset()
   }
+  const onUpdate = async(data) =>{
+  
+    const response = await axios.put(`http://127.0.0.1:3000/api/clientes/${idSearch}`, {
+      nombre:data.firstName,
+      apellidos:data.lastName
+    });
+    setIsError(false);
+    setmessage("cliente actualizado correctamente");
+    setTimeout(() => {
+      setmessage('');
+      reset();
+    }, 2000);
+    SetidSearch('');
+  }
+  const onDelete = async(data) =>{
+    if (confirm(`esta seguro de eliminar al cliente ${data.firstName} ${data.lastName}`)) {
+      const response=await axios.delete(`http://127.0.0.1:3000/api/clientes/${idSearch}`);
+      setIsError(false);
+      setmessage("cliente eliminado correctamente");
+      data.firstName=" ";
+      data.lastName=" ";
+      setTimeout(() => {
+        setmessage('');
+        reset();
+      }, 2000);
+    } }
+
   // } console.log(data);
   const onSearch=async()=>{
     const response=await axios.get(`http://127.0.0.1:3000/api/clientes/${idSearch}`);
@@ -45,6 +72,8 @@ export default function customerScreen() {
       setmessage("id del cliente no existe")
     }
   }
+
+
   return (
     <View style={styles.container}>
       <Text style={{fontSize:32}}>CLIENTES</Text>
@@ -123,7 +152,7 @@ export default function customerScreen() {
         <Button
           icon="plus-box"
           mode="contained"
-          onPress={()=>console.log("Pressed")}
+          onPress={handleSubmit(onUpdate)}
           style={{ backgroundColor: "purple" }}
         >
           ACTUALIZAR
